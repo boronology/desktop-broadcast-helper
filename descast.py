@@ -171,4 +171,24 @@ def set_threads():
             return "-threads {0}".format(selection)
         else:
             return "-threads {}".format(processors)
+
+def output():
+    print ("出力先を選んでください" +
+           "1 - Ustream、ニコニコ動画等で配信\n2 - ローカルに保存\n3 - 配信と同時にローカルに保存")
+    output_files = ""
+    selection = raw_input(">>")
+    if selection in ["1","2","3"]:
+        if selection == "1" or selection=="3":
+            print "配信するURLを入力してください"
+            output_files += ("-f flv " + raw_input(">>"))
+        if selection == "2" or selection == "3":
+            print "保存するファイル名を入力してください(.mp4)"
+            output_files += ((" \\"+"\n")*(selection=="3")+raw_input(">>") + ".mp4")
+        return output_files
+    else:
+        return output()
         
+        
+        
+if __name__=="__main__":
+    pass
