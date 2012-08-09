@@ -39,7 +39,7 @@ def get_video_source():
 	if(exist_video0):
 		print "入力する画像のソースを選択してください"
 		print "1 - /dev/video（webcam studioやカメラ等を利用する場合）"
-		print "2 - X11（画面を直接キャプチャする場合。録画開始後に範囲や位置の変更はできません）"
+		print "2 - X11（画面を直接キャプチャする場合）"
 		selection = raw_input(">>")
 		if selection == "1":
 			return dev_video()
@@ -62,26 +62,23 @@ def capture_x11():
 	"""
 	通常の画面出力からキャプチャする
 	"""
+	print "キャプチャする範囲を設定します。\nこれらは録画開始後には変更できません。"
+	
 	print "キャプチャする横幅を入力してください"
 	width = raw_input(">>")
 	print "キャプチャする縦幅を入力してください"
 	height = raw_input(">>")
-
+	
 	print "x方向（右方向への）オフセットを入力してください"
 	offset_x = raw_input(">>")
 	print "y方向（下方向への）オフセットを入力してください"
 	offset_y = raw_input(">>")
 	
-	try:
-		width = int(width)
-		height = int(height)
-		offset_x = int(offset_x)
-		offset_y = int(offset_y)
-	except ValueError:
+	if width.isdigit()==height.isdigit()==offset_x.isdigit()==offset_y.isdigit()==1:
+		return "-f x11grab -s {0}x{1} -i :0.0+{2},{3}".format(width,height,offset_x,offset_y)
+	else:
 		print "入力が不正です。再入力してください"
 		return capture_x11()
-		
-	return "-f x11grab -s {0}x{1} -i :0.0+{2},{3}".format(width,height,offset_x,offset_y)
 
 def get_sound_source():
 	"""
@@ -139,10 +136,11 @@ def get_rec_mic():
             print "番号が不正です。もう一度入力してください"
             return get_rec_mic()
 
-def get_output_video_codec:
+def set_output_video:
     """
     配信に使うことからlibx264をデフォルトで。
     後で選択できるようにするかも。
     ffmpeg -codecsで一覧が表示できる
     """
-    
+	print "出力する解像度を設定します"
+    return "-vcodec libx264"
