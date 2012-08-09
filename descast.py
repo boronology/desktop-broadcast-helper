@@ -1,7 +1,7 @@
 #!/usr/bin/env/ python
 # -*-coding: utf-8 -*-
 
-import os,sys
+import os,sys,subprocess
 
 def set_encoder():
     """
@@ -26,7 +26,7 @@ def set_encoder():
         print "利用できるエンコーダが存在しません。\nffmpegかlibavをインストールしてください"
         return 0
     else:
-        return "ffmpeg"*exist_ffmpeg + "avconv"+exist_libav
+        return "ffmpeg"*exist_ffmpeg + "avconv"*exist_libav
 
 def set_video_source():
     """
@@ -97,14 +97,14 @@ def set_sound_source():
         return set_sound_source()
 
 def set_rec_playing():
-    return "-f alsa -ac 2 -i pulse"
+    return "-f alsa -ac 2 -i default"
 
 def set_rec_card():
     with open("/proc/asound/cards") as cards:
         cards_list = cards.readlines()
         if len(cards_list)==2:
             print "1つのカードが見つかりました。{0}を選択します".format(cards_list[0])
-            return "hw:0"
+            return "-f alsa -i hw:0"
         else:
             print "複数のカードが見つかりました。\nマイクの接続されているカードを選んでください"
             cards_max = len(cards_list)/2-1
@@ -113,7 +113,7 @@ def set_rec_card():
             print "0-{0}".format(cards_max)
             selection = raw_input(">>")
             if selection.isdigit() and 0 <= int(selection) <= cards_max:
-                return "hw:" + selection
+                return "-f alsa -i hw:" + selection
             else:
                 print "入力が不正です。再入力してください"
                 return set_rec_card()
@@ -136,12 +136,19 @@ def set_output_video():
         print "入力が不正です。再入力してください。"
         return set_output_video()
 
-def set_output_sound(is_sound):
+def set_output_sound(encoder,is_sound):
+    encoder_codecs = subprocess.check_output([encoder,"-codecs"])
+    use_encoder = "libmp3lame"
+    if "libvo_aacenc" in encoder_codecs:
+        use_encoder = "libvo_aacenc"
+    elif "libfaac" in encoder_codecs:
+        use_encoder = "libfaac"
     if is_sound:
+        print "オーディオのコーデックとして{0}を使用します".format(encoder_codecs)
         print "出力するサウンドのビットレートを入力してください(kbit/s)"
         bitrate = raw_input(">>")
         if bitrate.isdigit():
-            return "-acodec libvo_aacenc -ar 44100 -ab {0}k".format(bitrate)
+            return "-acodec {0} -ar 44100 -ab {1}k".format(use_encoder,bitrate)
         else:
             print "入力が不正です。再入力してください。"
             return set_output_sound(is_sound)
@@ -207,7 +214,7 @@ if __name__=="__main__":
     video_source = set_video_source()
     sound_source = set_sound_source()
     output_video = set_output_video()
-    sound_output = set_output_sound(sound_source!="-an")
+    sound_output = set_output_sound(encoder,sound_source!="-an")
     output_volume = set_output_volume(sound_source!="-an")
     threads = set_threads()
     output_file = set_output()
