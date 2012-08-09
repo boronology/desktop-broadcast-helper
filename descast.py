@@ -137,14 +137,14 @@ def set_output_video():
         return set_output_video()
 
 def set_output_sound(encoder,is_sound):
-    encoder_codecs = subprocess.check_output([encoder,"-codecs"])
-    use_encoder = "libmp3lame"
-    if "libvo_aacenc" in encoder_codecs:
-        use_encoder = "libvo_aacenc"
-    elif "libfaac" in encoder_codecs:
-        use_encoder = "libfaac"
     if is_sound:
-        print "オーディオのコーデックとして{0}を使用します".format(encoder_codecs)
+        encoder_codecs = subprocess.check_output([encoder,"-codecs"])
+        use_encoder = "libmp3lame"
+        if "libvo_aacenc" in encoder_codecs:
+            use_encoder = "libvo_aacenc"
+        elif "libfaac" in encoder_codecs:
+            use_encoder = "libfaac"
+        print "オーディオのコーデックとして{0}を使用します".format(use_encoder)
         print "出力するサウンドのビットレートを入力してください(kbit/s)"
         bitrate = raw_input(">>")
         if bitrate.isdigit():
