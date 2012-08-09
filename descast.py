@@ -1,9 +1,9 @@
 #!/usr/bin/env/ python
 # -*-coding: utf-8 -*-
 
-import os
+import os,sys
 
-def get_encoder():
+def set_encoder():
     """
     エンコーダを取得する。
     見つかった場合にはavconvあるいはffmpegの文字列を返す。
@@ -21,14 +21,14 @@ def get_encoder():
             return "avconv"
         else:
             print "値が不正です\n"
-            return get_encoder()
+            return set_encoder()
     elif (exist_libav or exist_ffmpeg)==0:
         print "利用できるエンコーダが存在しません。\nffmpegかlibavをインストールしてください"
         return 0
     else:
         return "ffmpeg"*exist_ffmpeg + "avconv"+exist_libav
 
-def get_video_source():
+def set_video_source():
     """
     動画のソースを取得する。
     /dev/video0あるいはX11のキャプチャ
@@ -45,7 +45,7 @@ def get_video_source():
             return capture_x11()
         else:
             print "値が不正です"
-            return get_video_source()
+            return set_video_source()
     else:
         return capture_x11()
 
@@ -78,7 +78,7 @@ def capture_x11():
         print "入力が不正です。再入力してください"
         return capture_x11()
 
-def get_sound_source():
+def set_sound_source():
     """
     入力するサウンドのソースを選択する
     どうやらffmpeg単体では複数の入力音声をひとつにまとめることはできないらしい
@@ -89,17 +89,17 @@ def get_sound_source():
     if selection == "0":
         return "-an"
     elif selection == "1":
-        return get_rec_mic()
+        return set_rec_card()
     elif selection == "2":
-        return get_rec_playing()
+        return set_rec_playing()
     else:
         print "入力が不正です"
-        return get_sound_source()
+        return set_sound_source()
 
-def get_rec_playing():
+def set_rec_playing():
     return "-f alsa -ac 2 -i pulse"
 
-def get_rec_card():
+def set_rec_card():
     with open("/proc/asound/cards") as cards:
         cards_list = cards.readlines()
         if len(cards_list)==2:
@@ -116,7 +116,7 @@ def get_rec_card():
                 return "hw:" + selection
             else:
                 print "入力が不正です。再入力してください"
-                return get_rec_card()
+                return set_rec_card()
 
 def set_output_video():
     """
@@ -124,11 +124,11 @@ def set_output_video():
     後で選択できるようにするかも。
     ffmpeg -codecsで一覧が表示できる
     """
-    print "出力する解像度を設定します\n縦の幅を入力してください"
+    print "出力する動画の解像度を設定します\n横の幅を入力してください"
     resolution_x = raw_input(">>")
-    print "横の幅を入力してください"
+    print "縦の幅を入力してください"
     resolution_y = raw_input(">>")
-    print "ビットレートを指定してください(kbit/s)"
+    print "動画のビットレートを指定してください(kbit/s)"
     bitrate = raw_input(">>")
     if resolution_x.isdigit() == resolution_y.isdigit() == bitrate.isdigit() == 1:
         return "-vcodec libx264 -s {0}x{1} -b {2}k -vsync 1".format(resolution_x,resolution_y,bitrate)
@@ -136,31 +136,32 @@ def set_output_video():
         print "入力が不正です。再入力してください。"
         return set_output_video()
 
-def set_output_sound(rec_sound):
-    if rec_sound:
+def set_output_sound(is_sound):
+    if is_sound:
         print "出力するサウンドのビットレートを入力してください(kbit/s)"
         bitrate = raw_input(">>")
         if bitrate.isdigit():
             return "-acodec libvo_aacenc -ar 44100 ab {0}k".format(bitrate)
         else:
             print "入力が不正です。再入力してください。"
-            return set_output_sound(rec_sound)
+            return set_output_sound(is_sound)
 
-def set_output_volume(rec_sound):
-    print "録音する音量を調整しますか？(y/n)"
-    selection = raw_input(">>")
-    if selection == "y":
-        print "音量を入力してください。デフォルトの音量は256です。"
-        volume = raw_input(">>")
-        if volume.isdigit():
-            return "-vol {0}".format(volume)
+def set_output_volume(is_sound):
+    if is_sound:
+        print "録音する音量を調整しますか？(y/n)"
+        selection = raw_input(">>")
+        if selection == "y":
+            print "音量を入力してください。デフォルトの音量は256です。"
+            volume = raw_input(">>")
+            if volume.isdigit():
+                return "-vol {0}".format(volume)
+            else:
+                print "入力が不正です。再入力してください。"
+                return set_output_volume(is_sound)
+        elif selection == "n":
+            return "-vol 256"
         else:
-            print "入力が不正です。再入力してください。"
-            return set_output_volume(rec_sound)
-    elif selection == "n":
-        return "-vol 256"
-    else:
-        return set_output_volume(rec_sound)
+            return set_output_volume(is_sound)
 
 def set_threads():
     with open("/proc/cpuinfo") as cpuinfo:
@@ -172,8 +173,8 @@ def set_threads():
         else:
             return "-threads {}".format(processors)
 
-def output():
-    print ("出力先を選んでください" +
+def set_output():
+    print ("出力先を選んでください\n" +
            "1 - Ustream、ニコニコ動画等で配信\n2 - ローカルに保存\n3 - 配信と同時にローカルに保存")
     output_files = ""
     selection = raw_input(">>")
@@ -186,9 +187,35 @@ def output():
             output_files += ((" \\"+"\n")*(selection=="3")+raw_input(">>") + ".mp4")
         return output_files
     else:
-        return output()
+        print "入力が不正です。"
+        return set_output()
         
         
         
 if __name__=="__main__":
-    pass
+    encoder = set_encoder()
+    if encoder==0:
+        sys.exit()
+        
+    video_source = set_video_source()
+    sound_source = set_sound_source()
+    output_video = set_output_video()
+    sound_output = set_output_sound(sound_source!="-an")
+    output_volume = set_output_volume(sound_source!="-an")
+    threads = set_threads()
+    output_file = set_output()
+
+    avconv_command = "padsp"
+    for i in [encoder,
+              video_source,
+              sound_source,
+              output_video,
+              sound_output,
+              output_volume,
+              threads,
+              output_file]:
+        if i != None:
+            avconv_command += (i + " \\\n")
+    print avconv_command
+    
+        
