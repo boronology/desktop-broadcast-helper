@@ -151,7 +151,7 @@ def set_output_sound(encoder,is_sound):
             return "-acodec {0} -ar 44100 -ab {1}k".format(use_encoder,bitrate)
         else:
             print "入力が不正です。再入力してください。"
-            return set_output_sound(is_sound)
+            return set_output_sound(encoder,is_sound)
 
 def set_output_volume(is_sound):
     if is_sound:
