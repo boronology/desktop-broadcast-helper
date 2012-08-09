@@ -141,7 +141,7 @@ def set_output_sound(is_sound):
         print "出力するサウンドのビットレートを入力してください(kbit/s)"
         bitrate = raw_input(">>")
         if bitrate.isdigit():
-            return "-acodec libvo_aacenc -ar 44100 ab {0}k".format(bitrate)
+            return "-acodec libvo_aacenc -ar 44100 -ab {0}k".format(bitrate)
         else:
             print "入力が不正です。再入力してください。"
             return set_output_sound(is_sound)
@@ -189,9 +189,16 @@ def set_output():
     else:
         print "入力が不正です。"
         return set_output()
-        
-        
-        
+
+def save_script(text):
+    print "作られたスクリプトを保存します。\nファイル名を入力してください。"
+    script_name = "./" + (raw_input(">>") or "descast") + ".sh"
+    with open(script_name,"w") as script_file:
+        script_file.write("#!/bin/sh\n")
+        script_file.write(text)
+        script_file.write("echo 配信終了")
+    print "保存が終了しました。"
+    
 if __name__=="__main__":
     encoder = set_encoder()
     if encoder==0:
@@ -205,7 +212,7 @@ if __name__=="__main__":
     threads = set_threads()
     output_file = set_output()
 
-    avconv_command = "padsp"
+    avconv_command = "padsp "
     for i in [encoder,
               video_source,
               sound_source,
@@ -215,7 +222,10 @@ if __name__=="__main__":
               threads,
               output_file]:
         if i != None:
-            avconv_command += (i + " \\\n")
-    print avconv_command
-    
-        
+            if i == output_file:
+                avconv_command += (i + "\n")
+            else:
+                avconv_command += (i + " \\\n")
+
+    save_script(avconv_command)
+
