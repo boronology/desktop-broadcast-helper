@@ -11,14 +11,17 @@
 
 ** あると便利かも
    - Webcam Studio
-   - libvo_aacencまたはlibfaac
+   - libvo_aacencまたはlibfaac（ない場合はlibmp3lameが選択されます）
 
 * 使い方
   - 端末上でpython descast.pyを実行してください
   - あるいはchmod +x descast.pyのあとで./descast.pyでも構いません
   - あとは質問に答えていけば勝手に配信（または録画）のスクリプトができあがります
   - できたスクリプトをchmod +x dekita.shのあと./dekita.shすれば実行できます
-  
+  - 再生中の音を録音する場合、必ずPulseaudio音量調節で入力装置のタブに行き
+    All input DevicesにしてMonitor ofから始まるデバイスを有効にしてください
+  - じゃないと録音できません。
+
 * 機能
 
 ** 入力ソース（動画）の選択
