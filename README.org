@@ -10,8 +10,8 @@
   - Python（残念ながら2系）
 
 ** あると便利かも
-   - [[http://www.ws4gl.org/] [Webcam Studio]]
-   − Webcam
+   - Webcam Studio http://www.ws4gl.org/ （デスクトップ配信に）
+   - Webcam（未検証）
    - libvo_aacencまたはlibfaac（ない場合はlibmp3lameが選択されます）
    - 配信サイトのアカウント（CaveTubeで動作確認）
 
