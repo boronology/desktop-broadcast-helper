@@ -182,7 +182,7 @@ def set_threads():
 
 def set_output():
     print ("出力先を選んでください\n" +
-           "1 - Ustream、ニコニコ動画等で配信\n2 - ローカルに保存\n3 - 配信と同時にローカルに保存")
+           "1 - Justin.tv、CaveTuve等で配信\n2 - ローカルに保存\n3 - 配信と同時にローカルに保存")
     output_files = ""
     selection = raw_input(">>")
     if selection in ["1","2","3"]:
