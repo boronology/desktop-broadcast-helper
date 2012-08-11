@@ -67,3 +67,6 @@
   - カメラを利用する際のエラー（The v4l2 frame is 〜 bytes, but 〜 bytes are expected /dev/video0）をなんとかする
   - /dev/videoが複数ある場合の選択をできるようにする
   - Ustreamで使えるようにする
+
+* ライセンス
+  - MITライセンスにて提供しています。
