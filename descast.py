@@ -203,7 +203,7 @@ def set_output():
     if selection in ["1","2","3"]:
         if selection == "1" or selection=="3":
             print "配信するURLを入力してください"
-            output_files += ("-f flv " + raw_input(">>"))
+            output_files += "-f flv \"{}\"".format(raw_input(">>"))
         if selection == "2" or selection == "3":
             print "保存するファイル名を入力してください(.mp4)"
             output_files += ((" \\"+"\n")*(selection=="3")+raw_input(">>") + ".mp4")
