@@ -37,7 +37,7 @@ def set_video_source():
     if(exist_video0):
         print "入力する画像のソースを選択してください"
         print "1 - /dev/video（webcam studioやカメラ等を利用する場合）"
-        print "2 - X11（画面を直接キャプチャする場合）"
+        print "2 - X11（画面を直接キャプチャする場合）" 
         selection = raw_input(">>")
         if selection == "1":
             return dev_video()
@@ -51,14 +51,29 @@ def set_video_source():
 
 def dev_video():
     """
-    video1,video2……が存在する場合はあとで書く
-    とりあえずvideo0に関してはこれで動く
+    /dev/videoの選択
+    /dev/videoは0から始まるものとして書いているので
+    1以上始まりや番号に飛びがある場合は正しく動かない
     """
-    return "-f video4linux2 -i /dev/video0"
-
+    videos = sorted(filter((lambda x:x[0:5]=="video"),os.listdir("/dev/")))
+    if len(videos) == 1:
+        print "/dev/video0が見つかりました。\n自動でこれを選択します。"
+        return "-f video4linux2 -i /dev/video0"
+    else:
+        for i in range(len(videos)):
+            print "{0} - {1}".format(i,videos[i])
+        print "複数のビデオ入力が見つかりました。"
+        print "どれを使用するか選択してください(0 - {})".format(len(videos))
+        selection = raw_input(">>")
+        if "video" + selection in videos:
+            return "-f video4linux2 -i /dev/video{}".format(selection)
+        else:
+            print "入力が不正です。再入力してください。"
+            return dev_video()
+        
 def capture_x11():
     """
-    通常の画面出力からキャプチャする
+    通常の画面出力からキャプチャする範囲を選択する
     """
     print "キャプチャする範囲を設定します。\nこれらは録画開始後には変更できません。"
     
