@@ -1,7 +1,7 @@
 #!/usr/bin/env/ python
 # -*-coding: utf-8 -*-
 
-import os,sys,subprocess
+import os,sys,subprocess,stat
 
 def set_encoder():
     """
@@ -219,6 +219,7 @@ def save_script(text):
         script_file.write("#!/bin/sh\n")
         script_file.write(text)
         script_file.write("echo 配信終了")
+    os.chmod(script_name,stat.S_IXUSR)
     print "保存が終了しました。"
     
 if __name__=="__main__":
