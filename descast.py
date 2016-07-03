@@ -219,7 +219,7 @@ def save_script(text):
         script_file.write("#!/bin/sh\n")
         script_file.write(text)
         script_file.write("echo 配信終了")
-    os.chmod(script_name,stat.S_IXUSR)
+    os.chmod(script_name,0755)
     print "保存が終了しました。"
     
 if __name__=="__main__":
